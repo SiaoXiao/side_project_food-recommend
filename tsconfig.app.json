@@ -1,0 +1,29 @@
+{
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+
+    /* 編譯目標與模組（沿用 Vue 官方預設即可） */
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ES2020",
+
+    /* 開發體驗 */
+    "baseUrl": ".",
+    "paths": { "@/*": ["src/*"] },
+    "resolveJsonModule": true,
+    "types": ["vite/client", "node"],
+
+    /* 效能（可選） */
+    "skipLibCheck": true,
+
+    /* Linting（你原本的我保留） */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "auto-imports.d.ts", "components.d.ts"]
+}
