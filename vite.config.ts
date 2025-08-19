@@ -11,7 +11,6 @@ export default defineConfig({
     vue(),
     tailwind(),
     AutoImport({
-      // 自動匯入 Vue / VueUse 等 API；要用再加
       imports: ['vue'],
       dts: 'auto-imports.d.ts',
       eslintrc: { enabled: false },
@@ -21,7 +20,6 @@ export default defineConfig({
       dts: 'components.d.ts',
       resolvers: [
         ElementPlusResolver({
-          // 自動載入樣式（建議用 sass，需安裝 sass）
           importStyle: 'sass',
         }),
       ],

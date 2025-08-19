@@ -1,4 +1,4 @@
-const KEY = 'food-recommender:prefs:v1';
+const KEY = 'ccbf:user-prefs:v1';
 
 /**
  * 讀寫使用者偏好（localStorage）
