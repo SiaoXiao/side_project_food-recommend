@@ -2,6 +2,7 @@
 import { ref, computed, watch, nextTick } from 'vue';
 import dataset from '@/data/foods.json';
 import type { FoodDataset, FoodCategory, BaseMeal } from '@/types/food';
+import type { DietaryPrefs } from '@/types/prefs';
 import { usePrefs } from '@/modules/prefs/usePrefs';
 import { recommendOne } from '@/modules/recommend/service';
 import DietaryPicker from '@/components/picker/DietaryPicker.vue';
@@ -10,14 +11,32 @@ import ResultCard from '@/components/result/ResultCard.vue';
 import AppHeader from '@/components/layout/AppHeader.vue';
 import AppFooter from '@/components/layout/AppFooter.vue';
 
-// ✅ 餐別：從 localStorage 還原，沒有就預設 'all'
+/* ---------------------------
+   餐別：localStorage 還原
+---------------------------- */
 const MEAL_KEY = 'meal:selected';
 const initialMeal = (localStorage.getItem(MEAL_KEY) as FoodCategory) || 'all';
 const meal = ref<FoodCategory>(initialMeal);
 watch(meal, (v) => localStorage.setItem(MEAL_KEY, v));
 
+/* ---------------------------
+   偏好與資料集
+---------------------------- */
 const { prefs } = usePrefs();
 const ds = dataset as unknown as FoodDataset;
+
+/* ---------------------------
+   Header 漸層
+---------------------------- */
+const headerGradient = computed(() => {
+  switch (meal.value) {
+    case 'breakfast': return 'fresh';
+    case 'lunch':     return 'fun';
+    case 'dinner':    return 'warm';
+    case 'all':
+    default:          return 'warm';
+  }
+});
 
 /* ---------------------------
    單一卡片模式
@@ -31,14 +50,10 @@ const cooling = ref(false); // 單抽：冷卻中
 // 左鍵文案：隨餐別動態變化
 const mealText = computed(() => {
   switch (meal.value) {
-    case 'breakfast':
-      return '早餐';
-    case 'lunch':
-      return '午餐';
-    case 'dinner':
-      return '晚餐';
-    default:
-      return '單一';
+    case 'breakfast': return '早餐';
+    case 'lunch':     return '午餐';
+    case 'dinner':    return '晚餐';
+    default:          return '單一';
   }
 });
 const singleButtonLabel = computed(() => `隨機推薦（${mealText.value}）`);
@@ -64,47 +79,6 @@ async function doRecommend() {
   cooling.value = false;
 }
 
-/** 若變更條件使當前結果不再合法 → 清空（不自動重抽） */
-function isCurrentResultValid(): boolean {
-  if (!resultId.value) return true;
-  const item = ds.items[resultId.value];
-  if (!item) return false;
-
-  if (meal.value !== 'all') {
-    const ids = ds.categories[meal.value as BaseMeal] ?? [];
-    if (!ids.includes(resultId.value)) return false;
-  }
-  const diet = prefs.value.dietary ?? {};
-  if (diet.vegetarian && !item.diet?.vegetarian) return false;
-  if (diet.noBeef && item.diet?.beef) return false;
-  if (diet.noPork && item.diet?.pork) return false;
-  return true;
-}
-watch(
-  [meal, () => prefs.value.dietary],
-  () => {
-    if (!isCurrentResultValid()) resultId.value = null;
-    // 設定變更時，同步清掉「計畫模式」結果
-    resultPlan.value = null;
-  },
-  { deep: true },
-);
-
-// Header 漸層
-const headerGradient = computed(() => {
-  switch (meal.value) {
-    case 'breakfast':
-      return 'fresh';
-    case 'lunch':
-      return 'fun';
-    case 'dinner':
-      return 'warm';
-    case 'all':
-    default:
-      return 'warm';
-  }
-});
-
 /* ---------------------------
    計畫模式（固定推薦三餐，合併成一張卡）
 ---------------------------- */
@@ -114,7 +88,7 @@ const resultPlan = ref<Plan | null>(null);
 const rollingPlan = ref(false); // 三餐：動畫中
 const coolingPlan = ref(false); // 三餐：冷卻中
 
-// 給 ResultCard 的資料：保留餐別標籤
+// 給 ResultCard 的資料：保留餐別標籤（固定順序）
 type PlanPair = { meal: BaseMeal; item: Item };
 const planPairs = computed<PlanPair[]>(() => {
   const p = resultPlan.value;
@@ -177,6 +151,34 @@ function handleAfterEnter() {
     }
   });
 }
+
+/* ---------------------------
+   變更條件 → 一律清空結果（統一行為）
+---------------------------- */
+const diet = computed(() => {
+  const d:DietaryPrefs = prefs.value.dietary ?? {};
+  return {
+    vegetarian: !!d.vegetarian,
+    noBeef: !!d.noBeef,
+    noPork: !!d.noPork,
+  };
+});
+
+// 只要餐別或任一偏好變動：立刻清空結果與動畫旗標
+watch(
+  () => [meal.value, diet.value.vegetarian, diet.value.noBeef, diet.value.noPork],
+  () => {
+    // 重置動畫/冷卻，避免卡住
+    rolling.value = false;
+    cooling.value = false;
+    rollingPlan.value = false;
+    coolingPlan.value = false;
+
+    // 清空兩種模式的結果
+    resultId.value = null;
+    resultPlan.value = null;
+  }
+);
 </script>
 
 <template>
@@ -209,7 +211,7 @@ function handleAfterEnter() {
           >
             🎲
           </span>
-          <span>{{ rolling || cooling ? '抽籤中…' : singleButtonLabel }}</span>
+          <span>{{ (rolling || cooling) ? '抽籤中…' : singleButtonLabel }}</span>
         </button>
 
         <!-- 右鍵：固定推薦三餐（合併一張卡） -->
@@ -221,7 +223,7 @@ function handleAfterEnter() {
           @click="doRecommendPlan"
         >
           <span aria-hidden="true" class="text-lg">🍽️</span>
-          <span>{{ rollingPlan || coolingPlan ? '產出中…' : '推薦三餐' }}</span>
+          <span>{{ (rollingPlan || coolingPlan) ? '產出中…' : '推薦三餐' }}</span>
         </button>
       </div>
     </div>
@@ -239,11 +241,11 @@ function handleAfterEnter() {
       <el-empty
         v-else
         class="bg-white rounded-2xl shadow mb-14"
-        :description="rolling || cooling ? '抽籤中…' : '條件變更後，請重新抽選'"
+        :description="(rolling || cooling) ? '抽籤中…' : '條件變更後，請重新抽選'"
       />
     </Transition>
 
-    <!-- 計畫模式：三餐合併成一張卡（但卡內顯示早餐/午餐/晚餐標籤） -->
+    <!-- 計畫模式：三餐合併成一張卡（卡內顯示早餐/午餐/晚餐標籤） -->
     <Transition v-else mode="out-in" name="pop" @after-enter="handleAfterEnter">
       <ResultCard
         v-if="planPairs.length"
