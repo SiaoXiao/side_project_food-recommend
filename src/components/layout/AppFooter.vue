@@ -1,12 +1,11 @@
 <template>
-  <footer class="max-w-[1920px] w-full bg-gray-800 text-gray-300 fixed bottom-0 left-0 right-0">
+  <footer class="w-full bg-gray-800 text-gray-300 fixed bottom-0 left-0 right-0">
     <div class="h-12 flex items-center justify-center">
       <p class="font-sans text-sm">
         {{ text }}
       </p>
     </div>
     <SupportMeButton />
-
   </footer>
 </template>
 
