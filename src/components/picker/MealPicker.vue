@@ -3,8 +3,8 @@ import type { FoodCategory } from '@/types/food';
 
 const model = defineModel<FoodCategory>({ required: true });
 
-type Opt = { label: string; value: FoodCategory; emoji: string };
-const options: Opt[] = [
+type TOptions = { label: string; value: FoodCategory; emoji: string };
+const options: TOptions[] = [
   { label: '早餐', value: 'breakfast', emoji: '🥯' },
   { label: '午餐', value: 'lunch', emoji: '🍛' },
   { label: '晚餐', value: 'dinner', emoji: '🍣' },
@@ -16,31 +16,29 @@ const options: Opt[] = [
   <div class="flex flex-col gap-2">
     <label class="text-sm font-medium text-gray-700">選擇餐別</label>
 
-    <!-- 桌機／平板：分段按鈕 -->
     <div class="hidden md:block">
       <el-radio-group v-model="model" class="meal-segment md:flex gap-3" size="large">
         <el-radio-button
-          v-for="o in options"
-          :key="o.value"
+          v-for="item in options"
+          :key="item.value"
           class="!rounded-xl overflow-hidden"
-          :label="o.value"
+          :label="item.value"
         >
-          <span class="inline-flex items-center gap-2 px-3">
-            <span aria-hidden="true">{{ o.emoji }}</span>
-            <span>{{ o.label }}</span>
+          <span class="flex items-center gap-2 px-3">
+            <span aria-hidden="true">{{ item.emoji }}</span>
+            <span>{{ item.label }}</span>
           </span>
         </el-radio-button>
       </el-radio-group>
     </div>
 
-    <!-- 手機：下拉選單（較省空間） -->
-    <div class="md:hidden">
+    <div class="block md:hidden">
       <el-select v-model="model" class="w-full" placeholder="請選擇">
         <el-option
-          v-for="o in options"
-          :key="o.value"
-          :label="`${o.emoji} ${o.label}`"
-          :value="o.value"
+          v-for="item in options"
+          :key="item.value"
+          :label="`${item.emoji} ${item.label}`"
+          :value="item.value"
         />
       </el-select>
     </div>
@@ -48,7 +46,6 @@ const options: Opt[] = [
 </template>
 
 <style scoped>
-/* 自訂分段按鈕的外觀（使用 Element Plus 的 radio-button） */
 .meal-segment :deep(.el-radio-button__inner) {
   border-radius: 0.75rem; /* 12px 圓角 */
   padding: 10px 14px;
@@ -69,7 +66,7 @@ const options: Opt[] = [
   background: #f8fafc; /* slate-50 */
 }
 
-/* 選中狀態：橘紅食慾漸層 */
+/* 選中狀態 */
 .meal-segment :deep(.el-radio-button.is-active .el-radio-button__inner) {
   color: #fff;
   border-color: transparent;

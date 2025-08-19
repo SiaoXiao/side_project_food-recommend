@@ -3,12 +3,11 @@ import type { FoodCategory, FoodDataset } from '@/types/food';
 export interface DietaryPrefs {
   noBeef?: boolean;
   noPork?: boolean;
-  vegetarian?: boolean; // 勾選後只顯示素食
+  vegetarian?: boolean;
 }
 
 export interface UserPrefs {
   dietary?: DietaryPrefs;
-  // 不再保存 favoritesIds / blacklistIds / history
 }
 
 export interface RecommendInput {

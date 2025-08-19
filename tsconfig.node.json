@@ -16,7 +16,7 @@
     /* 建議開：提升速度、避免三方型別小衝突 */
     "skipLibCheck": true,
 
-    /* Linting（保留你原本的） */
+    /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,

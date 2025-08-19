@@ -22,11 +22,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 const gradientClass =
   {
-    // 食慾系（橘紅）
+    // 橘紅
     warm: 'bg-gradient-to-r from-orange-500 to-red-500',
-    // 清爽系（綠）
+    // 綠
     fresh: 'bg-gradient-to-r from-emerald-400 to-lime-600',
-    // 活潑系（粉紫）
+    // 粉紫
     fun: 'bg-gradient-to-r from-pink-500 to-purple-500',
     // 單色（無漸層，取決於文字色）
     mono: '',
@@ -47,7 +47,7 @@ const gradientClass =
       <div class="min-w-0">
         <h1
           :aria-label="title"
-          class="text-2xl md:text-3xl font-extrabold leading-tight tracking-tight bg-clip-text text-transparent"
+          class="text-2xl md:text-3xl font-bold leading-tight tracking-tight bg-clip-text text-transparent"
           :class="gradientClass || 'text-gray-900 dark:text-gray-100'"
         >
           {{ title }}
@@ -58,7 +58,6 @@ const gradientClass =
         </p>
       </div>
 
-      <!-- 右側可放操作列 -->
       <div class="ml-auto">
         <slot name="actions" />
       </div>

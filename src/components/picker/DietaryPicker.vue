@@ -2,34 +2,30 @@
 import { reactive, watch } from 'vue';
 import type { DietaryPrefs } from '@/types/prefs';
 
-/** 父層 v-model 綁定 */
 const model = defineModel<DietaryPrefs>({
   default: { noBeef: false, noPork: false, vegetarian: false },
 });
 
-/** 本地表單狀態（避免直接改 props） */
 const form = reactive<DietaryPrefs>({
   noBeef: !!model.value?.noBeef,
   noPork: !!model.value?.noPork,
   vegetarian: !!model.value?.vegetarian,
 });
 
-/** 父層變動 → 同步到本地 */
 watch(
   model,
-  (v) => {
-    form.noBeef = !!v?.noBeef;
-    form.noPork = !!v?.noPork;
-    form.vegetarian = !!v?.vegetarian;
+  (val) => {
+    form.noBeef = !!val?.noBeef;
+    form.noPork = !!val?.noPork;
+    form.vegetarian = !!val?.vegetarian;
   },
   { immediate: true, deep: true },
 );
 
-/** 本地變動 → 回寫父層（含互斥規則） */
 watch(
   form,
-  (v) => {
-    const next = { ...v };
+  (val) => {
+    const next = { ...val };
     if (next.vegetarian) {
       next.noBeef = false;
       next.noPork = false;
@@ -39,12 +35,10 @@ watch(
   { deep: true },
 );
 
-/** 膠囊切換 */
 function toggle(key: keyof DietaryPrefs) {
   if (key === 'vegetarian') {
     form.vegetarian = !form.vegetarian;
   } else if (!form.vegetarian) {
-    // 只在非素食時可切換牛/豬
     form[key] = !form[key];
   }
 }
@@ -55,7 +49,6 @@ function toggle(key: keyof DietaryPrefs) {
     <label class="block text-sm font-medium text-gray-700">飲食偏好</label>
 
     <div class="flex flex-wrap gap-3">
-      <!-- 不吃牛 -->
       <button
         :aria-pressed="form.noBeef"
         class="chip"
@@ -68,7 +61,6 @@ function toggle(key: keyof DietaryPrefs) {
         <span>不吃牛</span>
       </button>
 
-      <!-- 不吃豬 -->
       <button
         :aria-pressed="form.noPork"
         class="chip"
@@ -81,7 +73,6 @@ function toggle(key: keyof DietaryPrefs) {
         <span>不吃豬</span>
       </button>
 
-      <!-- 素食 -->
       <button
         :aria-pressed="form.vegetarian"
         class="chip"
@@ -117,7 +108,7 @@ function toggle(key: keyof DietaryPrefs) {
   box-shadow: 0 6px 14px rgba(239, 68, 68, 0.25);
 }
 
-/* ✅ 素食專屬 active（綠色漸層） */
+/* 素食專屬 active（綠色漸層） */
 .chip.active.vegetarian {
   background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%); /* from-green-500 to-green-600 */
   box-shadow: 0 6px 14px rgba(22, 163, 74, 0.25);

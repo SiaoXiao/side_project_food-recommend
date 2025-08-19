@@ -1,7 +1,7 @@
 const KEY = 'ccbf:user-prefs:v1';
 
 /**
- * 讀寫使用者偏好（localStorage）
+ * 讀寫使用者偏好
  *
  * @returns {UserPrefs} or null
  */
@@ -18,8 +18,7 @@ export function readPrefs<T>(): T | null {
  * 儲存使用者偏好
  *
  * @param {T} data - 要保存的偏好資料
- * @returns {void} 無返回值
  */
-export function writePrefs<T>(data: T): void {
+export function writePrefs<T>(data: T) {
   localStorage.setItem(KEY, JSON.stringify(data));
 }

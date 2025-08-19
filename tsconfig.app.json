@@ -3,7 +3,7 @@
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
 
-    /* 編譯目標與模組（沿用 Vue 官方預設即可） */
+    /* 編譯目標與模組 */
     "module": "ESNext",
     "moduleResolution": "bundler",
     "target": "ES2020",
@@ -17,7 +17,7 @@
     /* 效能（可選） */
     "skipLibCheck": true,
 
-    /* Linting（你原本的我保留） */
+    /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,

@@ -1,7 +1,3 @@
-export function pickRandom<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
 /**
  * 加權隨機抽樣
  *
@@ -17,4 +13,16 @@ export function weightedPick<T>(items: T[], weights: number[]): T {
     if (r <= 0) return items[i];
   }
   return items[items.length - 1];
+}
+
+
+/**
+ * 等機率隨機抽一個項目
+ * @returns T | null 當 items 為空時回傳 null
+ */
+export function randomPick<T>(items: readonly T[]): T | null {
+  const n = items.length;
+  if (n === 0) return null;
+  const i = Math.floor(Math.random() * n);
+  return items[i] ?? null;
 }
