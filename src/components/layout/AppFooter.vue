@@ -5,12 +5,14 @@
         {{ text }}
       </p>
     </div>
+    <SupportMeButton />
+
   </footer>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-
+import SupportMeButton from '@/components/support/SupportMeButton.vue'
 const year = new Date().getFullYear();
 const text = ref(`© ${year} SiaoXiao. All rights reserved.`);
 </script>
